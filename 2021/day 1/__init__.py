@@ -25,4 +25,6 @@ def part_2():
 
     print(inc)
 
+
+part_1()
 part_2()
