@@ -1,7 +1,11 @@
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy
-from matplotlib.pyplot import figure
+# from matplotlib.pyplot import figure
 import functools
+import sys
+
+import numpy as np
+
 
 def read_input():
     with open('input.txt') as f:
@@ -29,66 +33,91 @@ class BinarySearch:
         return round(self.curr)
 
 
-def memoize(f):
-    memo = {}
-    def helper(x):
-        if x not in memo:
-            memo[x] = f(x)
-        return memo[x]
-    return helper
-
-
-@functools.cache
-def fuel_cost(crabs, point):
-    tot = 0
-    for c in crabs:
-        tot += abs(c - point)
-    return tot
-
-
 def part_1():
     tl = read_input()
 
+    @functools.cache
+    def fuel_cost(point):
+        return np.sum(np.absolute(crabs - point))
+
     crabs = numpy.array([int(crab) for crab in tl]).astype(int)
 
+    print(crabs.shape)
 
     found = False
     n = 0
-    print(crabs.max())
+    print('max_crabs', crabs.max())
     bi = BinarySearch(crabs.max())
     curr = bi.get_curr()
-
-    fuel_cost_memo = {}
+    fc = None
 
     while found is False and n < 100:
+        print('curr: ', curr)
+        fc_minus = fuel_cost(curr - 1)
+        fc = fuel_cost(curr)
+        fc_plus = fuel_cost(curr + 1)
 
-
-        fuel_cost(crabs, curr)
-
+        if fc_plus > fc > fc_minus:
+            curr = bi.down()
+        elif fc_minus > fc > fc_plus:
+            curr = bi.up()
+        elif fc_plus > fc < fc_minus:
+            print('found')
+            found = True
+            print(curr)
 
         n += 1
-    # print(crabs)
-    # print(sum(crabs)/len(crabs))
-    #
-    # fuels = []
-    # for x in range(0, 1100):
-    #     tot = 0
-    #     for c in crabs:
-    #         tot += abs(c - x)
-    #     fuels.append(tot)
-    # plt.plot(fuels)
-    # plt.show()
+
+    print('fuel cost:', fc)
+
+
+@functools.cache
+def triangle_number(number):
+    if number == 0:
+        return 0
+    if number == 1:
+        return 1
+    return number + triangle_number(number - 1)
+
 
 def part_2():
     tl = read_input()
+    sys.setrecursionlimit(1900)
 
-    inc = 0
-    for n in range(3, len(tl)):
-        if tl[n] > tl[n-3]:
-            inc += 1
+    @functools.cache
+    def triangle_fuel_cost(point):
+        return sum([triangle_number(val) for val in np.absolute(crabs - point)])
 
-    print(inc)
+    crabs = numpy.array([int(crab) for crab in tl]).astype(int)
+
+    print(crabs.shape)
+
+    found = False
+    n = 0
+    print('max_crabs', crabs.max())
+    bi = BinarySearch(crabs.max())
+    curr = bi.get_curr()
+    fc = None
+
+    while found is False and n < 100:
+        print('curr: ', curr)
+        fc_minus = triangle_fuel_cost(curr - 1)
+        fc = triangle_fuel_cost(curr)
+        fc_plus = triangle_fuel_cost(curr + 1)
+
+        if fc_plus > fc > fc_minus:
+            curr = bi.down()
+        elif fc_minus > fc > fc_plus:
+            curr = bi.up()
+        elif fc_plus > fc < fc_minus:
+            print('found')
+            found = True
+            print(curr)
+
+        n += 1
+
+    print('fuel cost:', fc)
 
 
-part_1()
-# part_2()
+# part_1()
+part_2()
