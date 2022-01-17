@@ -142,34 +142,34 @@ def part_2():
     #                 dub = path
     #                 traverse_cave_system(path, visited, curr, dub)
 
-    traverse_cave_system('start', [], None, None)
-    # traverse_cave_system('A', ['A', 'b', 'A', 'c'], None, None)
+    cave_paths = []
 
-    cave_paths_set = set()
+    def traverse_cave_system(curr, visited, dub):
+        curr_visited = visited.copy()
+        curr_visited.append(curr)
+        curr_dub = dub
 
-    for path in cave_paths:
-        cave_paths_set.add(''.join(path))
+        if curr == 'end':
+            cave_paths.append(curr_visited)
+            return
 
-    s, e = 0,10
-    for path in sorted(cave_paths, key=lambda x: len(x)):
-        print(path)
+        for path in cave_map[curr]:
+            if path.isupper():
+                traverse_cave_system(path, curr_visited, curr_dub)
+            if path.islower():
+                if path not in visited:
+                    traverse_cave_system(path, curr_visited, curr_dub)
+                elif path in visited and curr_dub is False:
+                    traverse_cave_system(path, curr_visited, True)
 
-    print("\n\n\n")
-    #
-    # for path in sorted(asdf, key=lambda x: len(x))[s:e]:
+    traverse_cave_system('start', [], False)
+
+    print('CAVES', len(cave_paths))
+    print('\n\n\n')
+
+    # for path in sorted(cave_paths, key=lambda x: len(x)):
     #     print(path)
 
-    for path in asdf:
-        same = False
-        for cave in cave_paths:
-            if cave == path:
-                same = True
-                break
-        if not same:
-            print(path)
-
-    print(len(cave_paths))
-    print(len(asdf))
 
 
 """
